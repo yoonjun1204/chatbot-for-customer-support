@@ -1,0 +1,47 @@
+{
+  "type": "MaxHistoryTrackerFeaturizer",
+  "state_featurizer": {
+    "action_texts": [],
+    "entity_tag_specs": [],
+    "feature_states": {
+      "intent": {
+        "back": 0,
+        "goodbye": 1,
+        "greet": 2,
+        "nlu_fallback": 3,
+        "order_status": 4,
+        "out_of_scope": 5,
+        "product_info": 6,
+        "restart": 7,
+        "returns": 8,
+        "session_start": 9
+      },
+      "action_name": {
+        "action_listen": 0,
+        "action_restart": 1,
+        "action_session_start": 2,
+        "action_default_fallback": 3,
+        "action_deactivate_loop": 4,
+        "action_revert_fallback_events": 5,
+        "action_default_ask_affirmation": 6,
+        "action_default_ask_rephrase": 7,
+        "action_two_stage_fallback": 8,
+        "action_unlikely_intent": 9,
+        "action_back": 10,
+        "...": 11,
+        "action_extract_slots": 12,
+        "utter_ask_order_number": 13,
+        "utter_default": 14,
+        "utter_goodbye": 15,
+        "utter_greet": 16
+      },
+      "entities": {
+        "order_number": 0
+      },
+      "slots": {},
+      "active_loop": {}
+    }
+  },
+  "remove_duplicates": true,
+  "max_history": 5
+}

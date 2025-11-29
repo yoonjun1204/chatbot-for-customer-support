@@ -1,0 +1,118 @@
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+
+from database import Base, engine, get_db
+from models import Conversation, Message
+from nlp import handle_intent, get_quick_replies
+from rasa_client import parse_message
+
+from sqlalchemy.orm import Session
+
+
+# Create tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Customer Support Chatbot API")
+
+# CORS so React frontend can call this API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # in production, lock this down
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class ChatRequest(BaseModel):
+    message: str
+    conversation_id: Optional[int] = None
+    user_id: Optional[str] = None
+
+
+class ChatResponse(BaseModel):
+    conversation_id: int
+    reply: str
+    intent: str
+    entities: Dict[str, Any]
+    quick_replies: List[str]
+    payload: Dict[str, Any]
+
+
+@app.post("/api/chat", response_model=ChatResponse)
+def chat_endpoint(req: ChatRequest, db: Session = Depends(get_db)):
+    # 1. Find or create conversation
+    if req.conversation_id:
+        conv = db.query(Conversation).filter(Conversation.id == req.conversation_id).first()
+    else:
+        conv = None
+
+    if not conv:
+        conv = Conversation(user_id=req.user_id or "anonymous", created_at=datetime.utcnow())
+        db.add(conv)
+        db.commit()
+        db.refresh(conv)
+
+    conv.updated_at = datetime.utcnow()
+    db.add(conv)
+
+    # 2. Store user message
+    user_msg = Message(
+        conversation_id=conv.id,
+        sender="user",
+        text=req.message,
+        created_at=datetime.utcnow(),
+    )
+    db.add(user_msg)
+
+    # 3. NLP: call Rasa to get intent + entities
+    intent, entities = parse_message(req.message)
+
+    # 4. Handle intent with backend logic (hybrid)
+    reply_text, payload = handle_intent(intent, entities, db=db)
+
+
+    # 5. Store bot message
+    bot_msg = Message(
+        conversation_id=conv.id,
+        sender="bot",
+        text=reply_text,
+        created_at=datetime.utcnow(),
+    )
+    db.add(bot_msg)
+
+    db.commit()
+
+    # 6. Quick replies
+    quick_replies = get_quick_replies(intent)
+
+    return ChatResponse(
+        conversation_id=conv.id,
+        reply=reply_text,
+        intent=intent,
+        entities=entities,
+        quick_replies=quick_replies,
+        payload=payload,
+    )
+
+
+@app.get("/api/conversations/{conversation_id}/messages")
+def get_conversation_messages(conversation_id: int, db: Session = Depends(get_db)):
+    msgs = (
+        db.query(Message)
+        .filter(Message.conversation_id == conversation_id)
+        .order_by(Message.created_at.asc())
+        .all()
+    )
+    return [
+        {
+            "id": m.id,
+            "sender": m.sender,
+            "text": m.text,
+            "created_at": m.created_at.isoformat(),
+        }
+        for m in msgs
+    ]

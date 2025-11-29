@@ -1,0 +1,60 @@
+version: "3.1"
+
+nlu:
+  - intent: greet
+    examples: |
+      - hi
+      - hello
+      - hey
+      - good morning
+      - good afternoon
+      - hi there
+      - hello bot
+      - hey assistant
+
+  - intent: product_info
+    examples: |
+      - I want to know about your shirts
+      - Tell me about the shirts
+      - What sizes do you have?
+      - Do you have black shirts?
+      - Any cotton shirts?
+      - Are your shirts unisex?
+      - What is the material of the shirts?
+
+  - intent: order_status
+    examples: |
+      - I want to check my order status
+      - Where is my order?
+      - Track my order
+      - When will my shirt arrive?
+      - status of order ORD12345
+      - check order ORD67890
+      - track ORD99999 please
+      - can you check order ORD55555 for me?
+
+  - intent: returns
+    examples: |
+      - I want to return a shirt
+      - How do I get a refund?
+      - What is your return policy?
+      - Can I exchange my shirt?
+      - I want to change size, can I exchange?
+
+  - intent: goodbye
+    examples: |
+      - bye
+      - see you
+      - good night
+      - thanks, bye
+      - talk to you later
+      - goodbye
+
+  - intent: abusive
+    examples: |
+      - fuck you
+      - you are useless
+      - stupid bot
+      - you are dumb
+      - this is shit
+      - what a horrible bot

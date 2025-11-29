@@ -1,0 +1,41 @@
+version: "3.1"
+
+intents:
+  - greet
+  - product_info
+  - order_status
+  - returns
+  - goodbye
+  - abusive
+  - nlu_fallback
+
+entities:
+  - order_number
+
+slots:
+  order_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: order_number
+
+responses:
+  utter_greet:
+    - text: "Hi! I'm your shirt assistant. I can help with product info, order status, and returns."
+
+  utter_goodbye:
+    - text: "Thanks for chatting! If you need anything else, just open the chat again."
+
+  utter_abusive:
+    - text: "I'm here to help. Let's keep the conversation respectful."
+
+  utter_default:
+    - text: "I'm not sure I understood that. I can help with product info, order status, and returns."
+
+  utter_ask_order_number:
+    - text: "Sure, please provide your order number (e.g., ORD12345)."
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
