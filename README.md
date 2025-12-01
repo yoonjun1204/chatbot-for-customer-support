@@ -98,9 +98,10 @@ cd chatbot-for-customer-support
 Navigate to backend:
 ```
 cd backend
-python -m venv .venv
+py -3.14 -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
+pip install requests
 ```
 
 Run backend:
@@ -116,7 +117,7 @@ http://localhost:8000
 ## 3️⃣ Rasa Setup
 ```
 cd rasa_bot
-python -m venv .venv
+py -3.10 -m venv .venv
 .\.venv\Scripts\activate
 pip install rasa
 ```
