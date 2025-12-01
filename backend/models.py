@@ -28,11 +28,25 @@ class Message(Base):
 
     conversation = relationship("Conversation", back_populates="messages")
 
+class User(Base):
+    """
+    Simple User table.
+    For FYP you can keep plaintext passwords or simple hash,
+    but in real life always hash properly.
+    """
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)  # simple for demo/FYP
+    name = Column(String, nullable=True)
+
+    orders = relationship("Order", back_populates="user")
+
 
 class Order(Base):
     """
-    Dummy order table to support "check order status" intent.
-    You can seed this table manually.
+    Order table linked to User.
     """
     __tablename__ = "orders"
 
@@ -41,3 +55,6 @@ class Order(Base):
     status = Column(String, default="Processing")
     estimated_delivery = Column(Date, nullable=True)
     customer_name = Column(String, nullable=True)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user = relationship("User", back_populates="orders")

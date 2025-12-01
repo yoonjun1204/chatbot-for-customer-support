@@ -2,7 +2,7 @@
 from typing import Dict, Any, List, Tuple, Optional
 from sqlalchemy.orm import Session
 
-from models import Order
+from models import Order, User  # ⬅️ import User as well
 
 
 def get_quick_replies(intent: str) -> List[str]:
@@ -33,13 +33,24 @@ def handle_intent(
     """
     payload: Dict[str, Any] = {}
 
+    # 🔐 auth info pushed in from main.py
+    #   - for guests: "anonymous" or None
+    #   - for logged-in users: something like their email
+    user_identifier: Optional[str] = entities.get("user_identifier")
+
     # --- Chat / small-talk intents handled entirely here ---
     if intent == "greet":
-        text = "Hi! 👋 I'm your shirt support assistant. I can help with product info, order status, and returns. What would you like to do?"
+        text = (
+            "Hi! 👋 I'm your shirt support assistant. I can help with product info, "
+            "order status (for signed-in customers), and returns. What would you like to do?"
+        )
         return text, payload
 
     if intent == "abusive":
-        text = "I'm here to help. Let's keep the conversation respectful. How can I assist you with your order or shirts?"
+        text = (
+            "I'm here to help. Let's keep the conversation respectful. "
+            "How can I assist you with your order or shirts?"
+        )
         return text, payload
 
     if intent == "goodbye":
@@ -48,6 +59,7 @@ def handle_intent(
 
     # --- Business intents below ---
 
+    # ✅ Product enquiry: always allowed (guest or logged-in)
     if intent == "product_info":
         text = (
             "We sell men's and women's shirts in sizes XS–XXL. "
@@ -56,6 +68,7 @@ def handle_intent(
         )
         return text, payload
 
+    # ✅ Returns info: always allowed (guest or logged-in)
     if intent == "returns":
         text = (
             "Our return policy: you can return or exchange shirts within 30 days "
@@ -64,18 +77,53 @@ def handle_intent(
         )
         return text, payload
 
+    # 🔐 Order status: login required
     if intent == "order_status":
+        # 1. If not logged in -> ask to sign in
+        if not user_identifier or user_identifier == "anonymous":
+            text = (
+                "To check your order status, please sign in first. "
+                "You can still ask me about product information without logging in. 🙂"
+            )
+            # Frontend can use this flag to open login dialog
+            payload["requires_login"] = True
+            return text, payload
+
+        # 2. Find the user in DB (assuming user_identifier is email)
+        user = db.query(User).filter(User.email == user_identifier).first()
+        if not user:
+            text = (
+                "I couldn't find your account in our system. "
+                "Please make sure you're signed in with the correct email."
+            )
+            payload["requires_login"] = True
+            return text, payload
+
+        # 3. Get order_number from entities
         order_number: Optional[str] = entities.get("order_number")
         if not order_number:
-            text = "Sure! Please provide your order number (e.g., ORD12345) so I can check the status."
+            text = "Sure! Please provide your order number (e.g., ORD-1001) so I can check the status."
+            payload["need_order_number"] = True
             return text, payload
 
-        # Look up order in DB
-        order = db.query(Order).filter(Order.order_number == order_number).first()
+        # 4. Look up order that belongs to this user
+        order = (
+            db.query(Order)
+            .filter(
+                Order.order_number == order_number,
+                Order.user_id == user.id
+            )
+            .first()
+        )
+
         if not order:
-            text = f"I couldn't find order **{order_number}**. Can you check the number and try again?"
+            text = (
+                f"I couldn't find order **{order_number}** under your account. "
+                "Please check the order ID or make sure you're signed in with the right email."
+            )
             return text, payload
 
+        # 5. Return order status
         text = f"Order **{order.order_number}** is currently **{order.status}**."
         if order.estimated_delivery:
             text += f" Estimated delivery date is {order.estimated_delivery}."
@@ -92,6 +140,7 @@ def handle_intent(
     # --- Fallback ---
     text = (
         "I'm not sure I understood that. I can help with product information, "
-        "order status, and returns. Could you rephrase or pick one of the suggestions?"
+        "order status (for signed-in customers), and returns. "
+        "Could you rephrase or pick one of the suggestions?"
     )
     return text, payload

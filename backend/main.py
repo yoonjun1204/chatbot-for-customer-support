@@ -2,10 +2,10 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, date
 
-from database import Base, engine, get_db
-from models import Conversation, Message
+from database import Base, engine, get_db, SessionLocal
+from models import Conversation, Message, User, Order
 from nlp import handle_intent, get_quick_replies
 from rasa_client import parse_message
 
@@ -16,6 +16,58 @@ from sqlalchemy.orm import Session
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Customer Support Chatbot API")
+
+@app.on_event("startup")
+def seed_sample_data():
+    db = SessionLocal()
+    try:
+        # Only seed if no users yet
+        if db.query(User).count() == 0:
+            # Create sample users
+            alice = User(
+                email="alice@example.com",
+                password="password123",   # simple for FYP/demo
+                name="Alice Tan",
+            )
+            bob = User(
+                email="bob@example.com",
+                password="password123",
+                name="Bob Lim",
+            )
+            db.add_all([alice, bob])
+            db.commit()
+            db.refresh(alice)
+            db.refresh(bob)
+
+            # Create sample orders
+            order1 = Order(
+                order_number="ORD-1001",
+                status="Processing",
+                estimated_delivery=date(2025, 12, 10),
+                customer_name="Alice Tan",
+                user_id=alice.id,
+            )
+            order2 = Order(
+                order_number="ORD-1002",
+                status="Shipped",
+                estimated_delivery=date(2025, 12, 5),
+                customer_name="Alice Tan",
+                user_id=alice.id,
+            )
+            order3 = Order(
+                order_number="ORD-2001",
+                status="Delivered",
+                estimated_delivery=date(2025, 11, 20),
+                customer_name="Bob Lim",
+                user_id=bob.id,
+            )
+
+            db.add_all([order1, order2, order3])
+            db.commit()
+
+            print("✅ Seeded sample users and orders")
+    finally:
+        db.close()
 
 # CORS so React frontend can call this API
 app.add_middleware(
@@ -51,10 +103,15 @@ def chat_endpoint(req: ChatRequest, db: Session = Depends(get_db)):
         conv = None
 
     if not conv:
+        # New conversation: use provided user_id or anonymous
         conv = Conversation(user_id=req.user_id or "anonymous", created_at=datetime.utcnow())
         db.add(conv)
         db.commit()
         db.refresh(conv)
+    else:
+        # Existing conversation: if user has just logged in, update user_id
+        if req.user_id and conv.user_id != req.user_id:
+            conv.user_id = req.user_id
 
     conv.updated_at = datetime.utcnow()
     db.add(conv)
@@ -71,9 +128,14 @@ def chat_endpoint(req: ChatRequest, db: Session = Depends(get_db)):
     # 3. NLP: call Rasa to get intent + entities
     intent, entities = parse_message(req.message)
 
+    # 🔐 Add auth info for intent handler
+    # Here I'm assuming user_id is stored as email or user primary key string.
+    # Frontend should only send this when user is logged in.
+    entities = entities or {}
+    entities["user_identifier"] = conv.user_id  # e.g. "alice@example.com" or "anonymous"
+
     # 4. Handle intent with backend logic (hybrid)
     reply_text, payload = handle_intent(intent, entities, db=db)
-
 
     # 5. Store bot message
     bot_msg = Message(
@@ -97,7 +159,6 @@ def chat_endpoint(req: ChatRequest, db: Session = Depends(get_db)):
         quick_replies=quick_replies,
         payload=payload,
     )
-
 
 @app.get("/api/conversations/{conversation_id}/messages")
 def get_conversation_messages(conversation_id: int, db: Session = Depends(get_db)):
