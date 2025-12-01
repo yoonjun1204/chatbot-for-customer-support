@@ -420,3 +420,103 @@
     bottom: 0.75rem;
   }
 }
+
+/* Chat header actions (login + close) */
+
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Small pill-style login / sign-out button in header */
+
+.chat-login-button {
+  border: none;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+}
+
+.chat-login-button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Login modal overlay */
+
+.chat-login-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40; /* above widget */
+}
+
+/* Login modal card */
+
+.chat-login-modal {
+  background: #ffffff;
+  padding: 1rem 1.25rem;
+  border-radius: 0.9rem;
+  width: 280px;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.35);
+}
+
+.chat-login-modal h3 {
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+}
+
+.chat-login-hint {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+/* Reuse .chat-input inside modal but make it full width */
+
+.chat-login-form .chat-input {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+/* Buttons row inside modal */
+
+.chat-login-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.chat-login-cancel,
+.chat-login-confirm {
+  border: none;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.chat-login-cancel {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.chat-login-cancel:hover {
+  background: #d1d5db;
+}
+
+.chat-login-confirm {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.chat-login-confirm:hover {
+  background: #1d4ed8;
+}

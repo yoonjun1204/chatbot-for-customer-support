@@ -28,10 +28,14 @@ nlu:
       - Where is my order?
       - Track my order
       - When will my shirt arrive?
-      - status of order ORD12345
-      - check order ORD67890
-      - track ORD99999 please
-      - can you check order ORD55555 for me?
+      - status of order [ORD-12345](order_number)
+      - check order [ORD-67890](order_number)
+      - track [ORD-99999](order_number) please
+      - can you check order [ORD-55555](order_number) for me?
+      - my order is [ORD-1001](order_number)
+      - [ORD-2001](order_number)
+      - check [ORD-1002](order_number)
+      - what's the status of [ORD-1001](order_number)?
 
   - intent: returns
     examples: |
@@ -58,3 +62,8 @@ nlu:
       - you are dumb
       - this is shit
       - what a horrible bot
+
+  # 🔹 Regex pattern to help Rasa recognise order numbers like ORD12345, ORD1001, etc.
+  - regex: order_number
+    examples: |
+      - ORD[0-9]+
