@@ -1,11 +1,19 @@
 📌 Shirtify – AI Customer Support Chatbot
+
 A full-stack AI support assistant for an e-commerce shirt store.
+
 This project includes:
+
 🧠 Rasa NLU for intent/entity recognition
+
 ⚡ FastAPI backend for authentication, chat processing & conversation storage
+
 🎨 React (Vite) frontend with a floating ChatGPT-style chat widget
+
 💾 SQLite database for users, conversations & messages
+
 🔐 User login + saved chat history
+
 💬 ChatGPT-like UI with a history sidebar & context continuation
 
 🚀 Project Structure
