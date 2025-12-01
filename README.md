@@ -1,193 +1,210 @@
-📌 Shirtify – AI Customer Support Chatbot
-A full-stack AI support assistant for an e-commerce shirt store.
-This project includes:
-🧠 Rasa NLU for intent/entity recognition
-⚡ FastAPI backend for authentication, chat processing & conversation storage
-🎨 React (Vite) frontend with a floating ChatGPT-style chat widget
-💾 SQLite database for users, conversations & messages
-🔐 User login + saved chat history
-💬 ChatGPT-like UI with a history sidebar & context continuation
+# 👕 Shirtify – AI Customer Support Chatbot
 
-🚀 Project Structure
+A full-stack AI-powered support assistant for an e-commerce shirt website.  
+This system behaves similarly to ChatGPT with:
+
+- 🧠 Natural language understanding (Rasa NLU)
+- 💬 A modern floating chat widget (React)
+- 🔐 Login system + saved chat history (FastAPI backend)
+- 🗂 ChatGPT-style left sidebar (Auth + Chat History)
+- 💾 SQLite database storing conversations & messages
+- 🚀 Seamless backend–frontend integration
+
+---
+
+## 📁 Project Structure
+```
 chatbot-for-customer-support/
 │
-├── backend/              # FastAPI backend
-│   ├── main.py
-│   ├── models.py
-│   ├── database.py
-│   ├── schemas.py
-│   ├── rasa_client.py
-│   ├── chatbot.db        # SQLite DB (ignored in Git)
-│   ├── .venv/            # Python virtual environment (ignored)
-│   └── requirements.txt
+├── backend/ # FastAPI backend
+│ ├── main.py
+│ ├── models.py
+│ ├── database.py
+│ ├── schemas.py
+│ ├── rasa_client.py
+│ ├── chatbot.db # SQLite DB (ignored in Git)
+│ ├── requirements.txt
+│ └── .venv/ # Python virtual environment (ignored)
 │
-├── frontend/             # React + Vite frontend
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── components/
-│   │   │   ├── ChatWidget.tsx
-│   │   │   ├── ChatHistoryPanel.tsx
-│   │   │   └── AuthPanel.tsx
-│   │   └── App.css
-│   └── package.json
+├── frontend/ # React + Vite frontend
+│ ├── src/
+│ │ ├── App.tsx
+│ │ ├── App.css
+│ │ └── components/
+│ │ ├── ChatWidget.tsx
+│ │ ├── ChatHistoryPanel.tsx
+│ │ └── AuthPanel.tsx
+│ ├── package.json
+│ └── vite.config.ts
 │
-└── rasa_bot/             # Rasa NLU project
-    ├── config.yml
-    ├── domain.yml
-    ├── data/
-    ├── actions/
-    ├── .venv/            # Rasa virtual env (ignored)
-    └── models/
+└── rasa_bot/ # Rasa chatbot project
+├── config.yml
+├── domain.yml
+├── data/
+├── actions/
+├── models/
+└── .venv/ # Rasa virtual environment (ignored)
+```
 
-🧠 Features
-✔ ChatGPT-style behaviour
-Memory inside each conversation
-Can continue a previous conversation
-Delete conversations
-Sidebar history like ChatGPT
 
-✔ Natural language understanding (Rasa)
-Understands intents:
-Product info
-Order status
-Returns/exchanges
-Small talk (“hello”, “bye”)
-Extracts useful entities (order numbers, sizes, colors, etc.)
+---
 
-✔ FastAPI Backend
-/auth/login and /auth/register
-/api/chat — sends user message → Rasa → stores reply
-/conversations — list user chats
-/conversations/{id} — delete chat
-/conversations/{id}/messages — load history
+# 🎯 Features
 
-✔ React Frontend
-Floating chat widget
-Beautiful modern UI
-Quick reply buttons
-Sidebar for account & chat history
-Works like ChatGPT
+### 🧠 Rasa AI / NLP
+- Understands intents like:
+  - Product information  
+  - Order status  
+  - Return & exchange policy  
+  - Greetings / small talk  
+- Extracts entities (order number, sizes, colors)
 
-⚙️ Installation
-1️⃣ Clone the repo
-git clone https://github.com/your-username/chatbot-for-customer-support.git
+### 💬 ChatGPT-like Web Chat
+- Floating chat bubble  
+- Typing indicator  
+- Quick replies  
+- Auto-scrolling  
+- Clean modern UI design  
+
+### 🔐 User Accounts
+- Login / Register  
+- Stores conversations per user  
+- Sidebar showing chat history  
+- Continue previous conversations  
+- Delete conversations  
+
+### 🗄 Database
+- SQLite (easy setup, portable)
+- Stores:
+  - Users  
+  - Conversations  
+  - Messages  
+
+---
+
+# 🛠 Installation & Setup
+
+---
+
+## 1️⃣ Clone the project
+
+```bash
+git clone https://github.com/YOUR_USERNAME/chatbot-for-customer-support.git
 cd chatbot-for-customer-support
+```
 
-🐍 2️⃣ Backend Setup (FastAPI)
-Go into backend:
+## 2️⃣ Backend Setup (FastAPI)
+
+Navigate to backend:
+```
 cd backend
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install -r requirements.txt
-
+```
 
 Run backend:
+```
 uvicorn main:app --reload
-
+```
 
 Backend runs at:
+```
 http://localhost:8000
+```
 
-🤖 3️⃣ Rasa Setup
+## 3️⃣ Rasa Setup
+```
 cd rasa_bot
 python -m venv .venv
 .\.venv\Scripts\activate
 pip install rasa
+```
 
-Train the model:
+Train the Rasa model:
+```
 rasa train
+```
 
-Run the Rasa server:
+Run Rasa API server:
+```
 rasa run --enable-api --cors="*"
+```
 
 Rasa runs at:
+```
 http://localhost:5005
+```
 
-🌐 4️⃣ Frontend Setup (React + Vite)
+## 4️⃣ Frontend Setup (React + Vite)
+```
 cd frontend
 npm install
 npm run dev
+```
 
 Frontend runs at:
+```
 http://localhost:5173
+```
 
-🔐 Authentication (Important)
-To use chat history, the user must log in.
-Use the Auth panel on the left sidebar, or call the API manually:
-
-Register
-POST /auth/register
-{
-  "username": "test",
-  "password": "1234"
-}
-
-Login
-POST /auth/login
-
-Save the returned access_token in localStorage.
-The frontend handles this automatically.
-
-💬 Sending a Chat Message
-
-Frontend calls:
-POST http://localhost:8000/api/chat
-{
-  "message": "hello",
-  "conversation_id": null
-}
-
-
-Backend:
-Creates conversation (if needed)
-Sends message to Rasa
-Saves user + bot messages in SQLite
-Returns bot reply
-
-🗄️ Database Schema
+## Database Schema
+```
 users
-| id | username | password_hash |
-
+column	        type
+id	            int
+username	    str
+password_hash	str
+```
+```
 conversations
-| id | user_id | title | created_at |
-
+column	        type
+id	            int
+user_id	        int
+title	        str
+created_at	    datetime
+```
+```
 messages
-| id | conversation_id | sender | text | created_at |
+column	        type
+id	            int
+conversation_id	int
+sender	        str ("user"/"bot")
+text	        str
+created_at	    datetime
+```
 
-🎨 UI Overview
-Chat Widget (bottom right)
-Smooth animation
-Quick replies
-Typing indicator
-Context-aware replies
+# 🎨 UI Features
 
-Sidebar (bottom left)
-Login / Register panel
-Chat history with scroll
-Click to restore conversation
-Delete chat
+Chat Widget
 
-🧪 Testing
-Backend tests
-curl -X POST http://localhost:8000/auth/register
-curl -X POST http://localhost:8000/api/chat
-curl http://localhost:8000/conversations
+- Floating bottom-right like ChatGPT
+- Smooth animations
+- Quick reply buttons
+- Auto-scroll
+- Typing indicator
 
-Rasa tests
-rasa shell
+Sidebar
 
-📦 Deployment
+- Fixed bottom-left
+- Login form
+- Chat history list
+- Delete chat buttons
 
-You may deploy via:
-Backend → Render, Railway, EC2
-Frontend → Vercel / Netlify
-Rasa → local server or VM
-SQLite can be swapped for PostgreSQL or MySQL easily.
+# Deployment (Optional)
 
-📄 License
-MIT License – free for study & modification.
+Possible deployment plan:
+- Frontend – Vercel / Netlify
+- Backend (FastAPI) – Render / Railway / EC2
+- Rasa – Self-host VM / EC2
+- Database – SQLite → PostgreSQL (for scaling)
 
-🙌 Credits
-Project created for educational purposes
-University of Wollongong – SIM Singapore
-CSIT321 / FYP Assistance Chatbot
+# License
+
+MIT License – free to use and modify.
+
+# Credits
+
+Developed for University of Wollongong (SIM)
+
+Final Year Project – AI Customer Support Chatbot
