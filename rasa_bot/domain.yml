@@ -30,11 +30,25 @@ responses:
   utter_abusive:
     - text: "I'm here to help. Let's keep the conversation respectful."
 
+  # 🔹 Used as fallback response
   utter_default:
     - text: "I'm not sure I understood that. I can help with product info, order status, and returns."
 
+  # 🔹 Used when user asks for order status
   utter_ask_order_number:
     - text: "Sure, please provide your order number (e.g., ORD12345)."
+
+  # 🔹 New: response for product info
+  utter_product_info:
+    - text: >
+        Our shirts are unisex and available in sizes S–XL. 
+        We have cotton and cotton-blend options in several colors like black, white, and blue.
+
+  # 🔹 New: response for returns / exchanges
+  utter_returns:
+    - text: >
+        You can return or exchange shirts within 30 days as long as they are unworn and with tags.
+        To start a return, please contact support with your order number.
 
 session_config:
   session_expiration_time: 60

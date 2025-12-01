@@ -15,3 +15,27 @@ rules:
     steps:
       - intent: goodbye
       - action: utter_goodbye
+
+  # 🔹 Use product_info intent
+  - rule: respond to product info questions
+    steps:
+      - intent: product_info
+      - action: utter_product_info
+
+  # 🔹 Use order_status intent + utter_ask_order_number
+  - rule: ask for order number when checking order status
+    steps:
+      - intent: order_status
+      - action: utter_ask_order_number
+
+  # 🔹 Use returns intent
+  - rule: respond to returns / exchange questions
+    steps:
+      - intent: returns
+      - action: utter_returns
+
+  # 🔹 Use utter_default as fallback for low-confidence intents
+  - rule: nlu fallback
+    steps:
+      - intent: nlu_fallback
+      - action: utter_default

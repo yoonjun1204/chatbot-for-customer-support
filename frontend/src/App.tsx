@@ -1,156 +1,107 @@
-// frontend/src/App.tsx
-import React, { useState, useEffect, FormEvent } from "react";
+import "./App.css";
+import ChatWidget from "./components/ChatWidget";
 
-type Sender = "user" | "bot";
-
-interface ChatMessage {
-  id: number;
-  sender: Sender;
-  text: string;
-}
-
-interface ChatApiResponse {
-  conversation_id: number;
-  reply: string;
-  intent: string;
-  entities: Record<string, any>;
-  quick_replies: string[];
-  payload: Record<string, any>;
-}
-
-const API_BASE = "http://localhost:8000";
-
-const App: React.FC = () => {
-  const [conversationId, setConversationId] = useState<number | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState("");
-  const [quickReplies, setQuickReplies] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const addMessage = (sender: Sender, text: string) => {
-    setMessages((prev) => [
-      ...prev,
-      { id: prev.length + 1, sender, text },
-    ]);
-  };
-
-  const sendMessage = async (text: string) => {
-    if (!text.trim()) return;
-
-    addMessage("user", text);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const res = await fetch(`${API_BASE}/api/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: text,
-          conversation_id: conversationId,
-          user_id: "web-user",
-        }),
-      });
-
-      if (!res.ok) {
-        throw new Error("API error");
-      }
-
-      const data: ChatApiResponse = await res.json();
-      setConversationId(data.conversation_id);
-      addMessage("bot", data.reply);
-      setQuickReplies(data.quick_replies || []);
-    } catch (err) {
-      console.error(err);
-      addMessage("bot", "Sorry, something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    sendMessage(input);
-  };
-
-  const handleQuickReply = (text: string) => {
-    sendMessage(text);
-  };
-
-  useEffect(() => {
-    // Initial greeting from bot
-    addMessage("bot", "Hi! 👋 I'm your shirt support chatbot. How can I help you today?");
-    setQuickReplies(["Ask about shirts", "Check order status", "Return / exchange policy"]);
-  }, []);
-
+const App = () => {
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden">
-        <header className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
-          <div>
-            <h1 className="font-semibold text-lg">Shirt Support Chatbot</h1>
-            <p className="text-xs opacity-80">Ask about products, orders, or returns</p>
+    <div className="page">
+      {/* Top navigation */}
+      <header className="nav">
+        <div className="nav-logo">Shirtify</div>
+        <nav className="nav-links">
+          <a href="#products">Products</a>
+          <a href="#about">About</a>
+          <a href="#support">Support</a>
+        </nav>
+      </header>
+
+      {/* Hero section */}
+      <section className="hero">
+        <div className="hero-text">
+          <h1>Crisp, Comfortable Shirts for Every Day</h1>
+          <p>
+            Discover premium cotton shirts designed for comfort, style, and
+            versatility. Work, weekend, or special occasions – we’ve got you
+            covered.
+          </p>
+          <a href="#products" className="hero-cta">
+            Browse Shirts
+          </a>
+        </div>
+        <div className="hero-image">
+          <div className="hero-card">
+            <h2>New Arrival</h2>
+            <p>Oxford Slim Fit Shirt</p>
+            <span className="hero-price">$49.90</span>
           </div>
-          <div className="w-3 h-3 rounded-full bg-green-400" title="Online"></div>
-        </header>
+        </div>
+      </section>
 
-        <main className="flex-1 flex flex-col p-3 overflow-y-auto space-y-2">
-          {messages.map((m) => (
-            <div
-              key={m.id}
-              className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`px-3 py-2 rounded-xl max-w-[80%] text-sm ${
-                  m.sender === "user"
-                    ? "bg-blue-600 text-white rounded-br-sm"
-                    : "bg-slate-200 text-slate-900 rounded-bl-sm"
-                }`}
-              >
-                {m.text}
-              </div>
-            </div>
-          ))}
-
-          {loading && (
-            <div className="flex justify-start">
-              <div className="px-3 py-2 rounded-xl bg-slate-200 text-slate-900 text-sm">
-                Typing…
-              </div>
-            </div>
-          )}
-        </main>
-
-        {quickReplies.length > 0 && (
-          <div className="px-3 pb-2 flex flex-wrap gap-2">
-            {quickReplies.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => handleQuickReply(q)}
-                className="text-xs border border-blue-500 text-blue-600 rounded-full px-3 py-1 hover:bg-blue-50 transition"
-              >
-                {q}
-              </button>
-            ))}
+      {/* Product grid */}
+      <section id="products" className="products-section">
+        <h2>Featured Shirts</h2>
+        <p className="section-subtitle">
+          A few of our most popular picks. Ask the chatbot for size or material recommendations.
+        </p>
+        <div className="product-grid">
+          <div className="product-card">
+            <div className="product-image product-image-1" />
+            <h3>Classic White Oxford</h3>
+            <p>Cotton-rich fabric, perfect for office and events.</p>
+            <span className="product-price">$45.00</span>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="px-3 py-2 border-t border-slate-200 flex gap-2">
-          <input
-            className="flex-1 border border-slate-300 rounded-full px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Type your message..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white text-sm px-4 py-2 rounded-full disabled:opacity-60"
-          >
-            Send
-          </button>
-        </form>
-      </div>
+          <div className="product-card">
+            <div className="product-image product-image-2" />
+            <h3>Casual Denim Shirt</h3>
+            <p>Soft-washed denim for relaxed weekends.</p>
+            <span className="product-price">$59.00</span>
+          </div>
+
+          <div className="product-card">
+            <div className="product-image product-image-3" />
+            <h3>Black Slim Fit</h3>
+            <p>Minimalist, modern, and easy to pair with anything.</p>
+            <span className="product-price">$52.00</span>
+          </div>
+        </div>
+      </section>
+
+      {/* About section */}
+      <section id="about" className="info-section">
+        <h2>Why Shop with Shirtify?</h2>
+        <div className="info-grid">
+          <div className="info-card">
+            <h3>Premium Materials</h3>
+            <p>
+              Our shirts use cotton and cotton blends carefully selected for
+              comfort, durability, and breathability.
+            </p>
+          </div>
+          <div className="info-card">
+            <h3>Easy Exchanges</h3>
+            <p>
+              Not the right size? Our 30-day return and exchange policy keeps
+              things easy and stress-free.
+            </p>
+          </div>
+          <div className="info-card">
+            <h3>Smart Chat Support</h3>
+            <p>
+              The built-in chatbot helps you with product questions, order
+              status, and return policy anytime.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer id="support" className="footer">
+        <p>Need help? Click the chat button at the bottom right to talk to Shirt Support.</p>
+        <p className="footer-muted">© {new Date().getFullYear()} Shirtify. All rights reserved.</p>
+      </footer>
+
+      {/* Chat widget floating on top */}
+      <ChatWidget />
     </div>
   );
 };
