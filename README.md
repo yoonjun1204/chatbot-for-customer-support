@@ -5,8 +5,7 @@ This system behaves similarly to ChatGPT with:
 
 - 🧠 Natural language understanding (Rasa NLU)
 - 💬 A modern floating chat widget (React)
-- 🔐 Login system + saved chat history (FastAPI backend)
-- 🗂 ChatGPT-style left sidebar (Auth + Chat History)
+- 🔐 Login system (FastAPI backend)
 - 💾 SQLite database storing conversations & messages
 - 🚀 Seamless backend–frontend integration
 
@@ -20,9 +19,9 @@ chatbot-for-customer-support/
 │ ├── main.py
 │ ├── models.py
 │ ├── database.py
-│ ├── schemas.py
+│ ├── nlp.py
 │ ├── rasa_client.py
-│ ├── chatbot.db # SQLite DB (ignored in Git)
+│ ├── database.db # SQLite DB (ignored in Git)
 │ ├── requirements.txt
 │ └── .venv/ # Python virtual environment (ignored)
 │
@@ -30,17 +29,22 @@ chatbot-for-customer-support/
 │ ├── src/
 │ │ ├── App.tsx
 │ │ ├── App.css
-│ │ └── components/
+| | ├── index.css
+| | ├── main.tsx
+│ │ |── components/
 │ │ ├── ChatWidget.tsx
-│ │ ├── ChatHistoryPanel.tsx
-│ │ └── AuthPanel.tsx
 │ ├── package.json
 │ └── vite.config.ts
 │
 └── rasa_bot/ # Rasa chatbot project
 ├── config.yml
+├── endpoints.yml
 ├── domain.yml
+├── credentials.yml
 ├── data/
+│  ├── nlu.yml
+│  ├── ruels.yml
+│  ├── stories.yml
 ├── actions/
 ├── models/
 └── .venv/ # Rasa virtual environment (ignored)
@@ -67,18 +71,16 @@ chatbot-for-customer-support/
 - Clean modern UI design  
 
 ### 🔐 User Accounts
-- Login / Register  
-- Stores conversations per user  
-- Sidebar showing chat history  
-- Continue previous conversations  
-- Delete conversations  
+- Login   
+- Stores conversations per user   
 
 ### 🗄 Database
 - SQLite (easy setup, portable)
 - Stores:
   - Users  
   - Conversations  
-  - Messages  
+  - Messages
+  - Order  
 
 ---
 
@@ -89,7 +91,7 @@ chatbot-for-customer-support/
 ## 1️⃣ Clone the project
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/chatbot-for-customer-support.git
+git clone https://github.com/yoonjun1204/chatbot-for-customer-support.git
 cd chatbot-for-customer-support
 ```
 
@@ -149,32 +151,6 @@ Frontend runs at:
 http://localhost:5173
 ```
 
-## Database Schema
-```
-users
-column	        type
-id	            int
-username	    str
-password_hash	str
-```
-```
-conversations
-column	        type
-id	            int
-user_id	        int
-title	        str
-created_at	    datetime
-```
-```
-messages
-column	        type
-id	            int
-conversation_id	int
-sender	        str ("user"/"bot")
-text	        str
-created_at	    datetime
-```
-
 # 🎨 UI Features
 
 Chat Widget
@@ -189,8 +165,7 @@ Sidebar
 
 - Fixed bottom-left
 - Login form
-- Chat history list
-- Delete chat buttons
+
 
 # Deployment (Optional)
 
