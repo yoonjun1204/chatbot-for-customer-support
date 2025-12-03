@@ -1,191 +1,162 @@
-# 👕 Shirtify – AI Customer Support Chatbot
+# 📦 Customer Support Chatbot (FastAPI + React + Rasa + PostgreSQL)
+A full-stack customer support chatbot system built with:
 
-A full-stack AI-powered support assistant for an e-commerce shirt website.  
-This system behaves similarly to ChatGPT with:
+- 🧠 Rasa 3.x (intent classification + entity extraction)
+- ⚙️ FastAPI backend (conversation logic + database + hybrid NLP)
+- 🌐 React + Vite frontend (chat UI)
+- 🗄️ PostgreSQL for storing users, messages & conversations
+- 🐳 Docker & Docker Compose for one-command deployment
 
-- 🧠 Natural language understanding (Rasa NLU)
-- 💬 A modern floating chat widget (React)
-- 🔐 Login system (FastAPI backend)
-- 💾 SQLite database storing conversations & messages
-- 🚀 Seamless backend–frontend integration
+This project is designed for academic purposes (FYP/CSIT321) but follows real-world architecture and production-grade practices.
 
----
+# 🚀 Features
+🤖 Chatbot Intelligence
+- Rasa NLU for intent recognition & entity extraction
+- Backend hybrid logic for:
+- Order tracking
+- Product inquiries
+- Returns & policies
+- General FAQs
 
-## 📁 Project Structure
+# 🧩 Backend (FastAPI)
+- Stores conversations & messages
+- Handles intents and replies
+- Integrates with Rasa via API
+- Provides quick replies
+- REST API with OpenAPI docs (/docs)
+
+# 💬 Frontend (React + Vite)
+- Clean chat interface
+- Typing indicator
+- Quick reply buttons
+- Conversation state handling
+- Backend + Rasa integration
+
+#🗄️ Database (PostgreSQL)
+- Users
+- Orders
+- Conversations
+- Messages
+
+# 🐳 Docker Architecture
+- Full environment starts with:
 ```
+docker compose up --build
+```
+
+Includes:
+- backend	FastAPI (Python 3.11)
+- frontend	React (Node 20 + Nginx)
+- db	PostgreSQL 16
+- rasa	Rasa 3.6
+
+```
+📁 Project Structure
 chatbot-for-customer-support/
 │
-├── backend/ # FastAPI backend
-│ ├── main.py
-│ ├── models.py
-│ ├── database.py
-│ ├── nlp.py
-│ ├── rasa_client.py
-│ ├── database.db # SQLite DB (ignored in Git)
-│ ├── requirements.txt
-│ └── .venv/ # Python virtual environment (ignored)
+├── backend/
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── nlp.py
+│   ├── rasa_client.py
+│   ├── requirements.txt
+│   └── Dockerfile
 │
-├── frontend/ # React + Vite frontend
-│ ├── src/
-│ │ ├── App.tsx
-│ │ ├── App.css
-| | ├── index.css
-| | ├── main.tsx
-│ │ |── components/
-│ │ ├── ChatWidget.tsx
-│ ├── package.json
-│ └── vite.config.ts
+├── frontend/
+│   ├── src/
+│   ├── package.json
+│   ├── Dockerfile
+│   └── vite.config.js
 │
-└── rasa_bot/ # Rasa chatbot project
-├── config.yml
-├── endpoints.yml
-├── domain.yml
-├── credentials.yml
-├── data/
-│  ├── nlu.yml
-│  ├── ruels.yml
-│  ├── stories.yml
-├── actions/
-├── models/
-└── .venv/ # Rasa virtual environment (ignored)
+├── rasa_bot/
+│   ├── domain.yml
+│   ├── nlu.yml
+│   ├── rules.yml
+│   ├── stories.yml
+│   └── models/
+│
+├── docker-compose.yml
+└── README.md
 ```
 
+# 🐳 Running the Project (One Command)
+Make sure Docker Desktop is running.
 
----
-
-# 🎯 Features
-
-### 🧠 Rasa AI / NLP
-- Understands intents like:
-  - Product information  
-  - Order status  
-  - Return & exchange policy  
-  - Greetings / small talk  
-- Extracts entities (order number, sizes, colors)
-
-### 💬 ChatGPT-like Web Chat
-- Floating chat bubble  
-- Typing indicator  
-- Quick replies  
-- Auto-scrolling  
-- Clean modern UI design  
-
-### 🔐 User Accounts
-- Login   
-- Stores conversations per user   
-
-### 🗄 Database
-- SQLite (easy setup, portable)
-- Stores:
-  - Users  
-  - Conversations  
-  - Messages
-  - Order  
-
----
-
-# 🛠 Installation & Setup
-
----
-
-## 1️⃣ Clone the project
-
-```bash
-git clone https://github.com/yoonjun1204/chatbot-for-customer-support.git
-cd chatbot-for-customer-support
+Then run:
+```
+docker compose up --build
 ```
 
-## 2️⃣ Backend Setup (FastAPI)
+This will:
+- Build backend image
+- Build frontend image
+- Start PostgreSQL
+- Start Rasa server
+- Serve frontend via Nginx
 
-Navigate to backend:
+Access the services:
+- Frontend	http://localhost:5173
+- FastAPI Docs http://localhost:8000/docs
+- Rasa Server http://localhost:5005
+
+# 🔄 Development Workflow
+1️⃣ If you update BACKEND code:
 ```
-cd backend
-py -3.14 -m venv .venv
-.\.venv\Scripts\activate
-pip install -r requirements.txt
-pip install requests
-```
-Seed the Data:
-```
-cd backend
-.\.venv\Scripts\activate
-python seed.py
-```
-Run backend:
-```
-uvicorn main:app --reload
+docker compose build backend
+docker compose up
 ```
 
-Backend runs at:
+If you changed requirements.txt:
 ```
-http://localhost:8000
+docker compose build backend --no-cache
 ```
-
-## 3️⃣ Rasa Setup
+2️⃣ If you update FRONTEND code:
 ```
-cd rasa_bot
-py -3.10 -m venv .venv
-.\.venv\Scripts\activate
-pip install rasa
+docker compose build frontend
+docker compose up
 ```
 
-Train the Rasa model:
+If you changed dependencies (package.json):
 ```
-rasa train
+docker compose build frontend --no-cache
 ```
+3️⃣ If you modify RASA training data:
 
-Run Rasa API server:
+Train the bot:
 ```
-rasa run --enable-api --cors="*"
-```
-
-Rasa runs at:
-```
-http://localhost:5005
+docker compose run --rm rasa train
 ```
 
-## 4️⃣ Frontend Setup (React + Vite)
+Restart services:
 ```
-cd frontend
-npm install
-npm run dev
+docker compose up
 ```
 
-Frontend runs at:
-```
-http://localhost:5173
-```
-
-# 🎨 UI Features
-
-Chat Widget
-
-- Floating bottom-right like ChatGPT
-- Smooth animations
-- Quick reply buttons
-- Auto-scroll
-- Typing indicator
-
-Sidebar
-
-- Fixed bottom-left
-- Login form
+# Database Schema (Simplified)
+- Users
+- Conversations
+- Messages
+- Orders
 
 
-# Deployment (Optional)
+# 🛠️ Technologies Used
+- FastAPI
+- React + Vite
+- Rasa 3.6
+- PostgreSQL
+- SQLAlchemy
+- Docker
+- Nginx
 
-Possible deployment plan:
-- Frontend – Vercel / Netlify
-- Backend (FastAPI) – Render / Railway / EC2
-- Rasa – Self-host VM / EC2
-- Database – SQLite → PostgreSQL (for scaling)
+# 📚 Future Improvements
+- JWT authentication
+- Admin dashboard
+- Multi-language support
+- Vector search for FAQ (OpenAI embeddings)
+- Real-time websocket chat
 
-# License
+# 👨‍💻 Author
+Jun Yoon
 
-MIT License – free to use and modify.
-
-# Credits
-
-Developed for University of Wollongong (SIM)
-
-Final Year Project – AI Customer Support Chatbot
+CSIT321 / University of Wollongong (SIM)
