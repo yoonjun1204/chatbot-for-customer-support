@@ -38,9 +38,17 @@ This project is designed for academic purposes (FYP/CSIT321) but follows real-wo
 - Conversations
 - Messages
 
+# Seeding Data
+```
+cd chatbot-for-customer-support\backend
+.venv\Scripts\activate
+python seed.py
+```
+
 # 🐳 Docker Architecture
 - Full environment starts with:
 ```
+cd chatbot-for-customer-support
 docker compose up --build
 ```
 
