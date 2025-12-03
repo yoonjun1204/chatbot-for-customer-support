@@ -105,7 +105,12 @@ py -3.14 -m venv .venv
 pip install -r requirements.txt
 pip install requests
 ```
-
+Seed the Data:
+```
+cd backend
+.\.venv\Scripts\activate
+python seed.py
+```
 Run backend:
 ```
 uvicorn main:app --reload
