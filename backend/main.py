@@ -17,58 +17,6 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Customer Support Chatbot API")
 
-@app.on_event("startup")
-def seed_sample_data():
-    db = SessionLocal()
-    try:
-        # Only seed if no users yet
-        if db.query(User).count() == 0:
-            # Create sample users
-            alice = User(
-                email="alice@example.com",
-                password="password123",   # simple for FYP/demo
-                name="Alice Tan",
-            )
-            bob = User(
-                email="bob@example.com",
-                password="password123",
-                name="Bob Lim",
-            )
-            db.add_all([alice, bob])
-            db.commit()
-            db.refresh(alice)
-            db.refresh(bob)
-
-            # Create sample orders
-            order1 = Order(
-                order_number="ORD-1001",
-                status="Processing",
-                estimated_delivery=date(2025, 12, 10),
-                customer_name="Alice Tan",
-                user_id=alice.id,
-            )
-            order2 = Order(
-                order_number="ORD-1002",
-                status="Shipped",
-                estimated_delivery=date(2025, 12, 5),
-                customer_name="Alice Tan",
-                user_id=alice.id,
-            )
-            order3 = Order(
-                order_number="ORD-2001",
-                status="Delivered",
-                estimated_delivery=date(2025, 11, 20),
-                customer_name="Bob Lim",
-                user_id=bob.id,
-            )
-
-            db.add_all([order1, order2, order3])
-            db.commit()
-
-            print("✅ Seeded sample users and orders")
-    finally:
-        db.close()
-
 # CORS so React frontend can call this API
 app.add_middleware(
     CORSMiddleware,
