@@ -29,7 +29,7 @@ interface ChatApiResponse {
   payload: ChatPayload;
 }
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -271,10 +271,7 @@ const ChatWidget: React.FC = () => {
             <div className="chat-login-backdrop">
               <div className="chat-login-modal">
                 <h3>Sign in to check your orders</h3>
-                <p className="chat-login-hint">
-                  Prototype login – enter your email (e.g. <code>alice@example.com</code> or{" "}
-                  <code>bob@example.com</code>).
-                </p>
+                <p className="chat-login-hint"></p>
                 <form onSubmit={handleLoginSubmit} className="chat-login-form">
                   <input
                     type="email"

@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16
+    container_name: chatbot_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chatbot_db
+      POSTGRES_USER: chatbot_user
+      POSTGRES_PASSWORD: chatbot_password
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432" # optional: expose for pgAdmin / local tools
+
+  rasa:
+    image: rasa/rasa:3.6.20-full
+    container_name: chatbot_rasa
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./rasa_bot:/app
+    command: >
+      run --enable-api --cors "*" --port 5005
+    ports:
+      - "5005:5005"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chatbot_backend
+    restart: unless-stopped
+    depends_on:
+      - db
+      - rasa
+    environment:
+      # SQLAlchemy Postgres URL (matches your updated database.py)
+      DATABASE_URL: postgresql+psycopg2://chatbot_user:chatbot_password@db:5432/chatbot_db
+
+      # Rasa URL for rasa_client.py (matches your updated code)
+      RASA_URL: http://rasa:5005/model/parse
+
+      # Optional: if you use CORS in FastAPI and want to read this
+      FRONTEND_ORIGIN: http://localhost:5173
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # These are used as ARG in the frontend Dockerfile → Vite ENV
+        VITE_API_BASE_URL: http://localhost:8000
+        VITE_RASA_BASE_URL: http://localhost:5005
+    container_name: chatbot_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  db_data:

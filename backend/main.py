@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -17,15 +18,15 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Customer Support Chatbot API")
 
+FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "*")
 # CORS so React frontend can call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # in production, lock this down
+    allow_origins=[FRONTEND_ORIGIN],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 class ChatRequest(BaseModel):
     message: str
