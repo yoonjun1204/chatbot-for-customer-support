@@ -40,9 +40,8 @@ This project is designed for academic purposes (FYP/CSIT321) but follows real-wo
 
 # Seeding Data
 ```
-cd chatbot-for-customer-support\backend
-.venv\Scripts\activate
-python seed.py
+cd chatbot-for-customer-support
+docker exec -it chatbot_backend python seed.py
 ```
 
 # 🐳 Docker Architecture
