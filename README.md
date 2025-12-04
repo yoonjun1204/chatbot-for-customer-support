@@ -60,11 +60,18 @@ Includes:
 - db	PostgreSQL 16
 - rasa	Rasa 3.6
 
-# Seeding Data
+# Seeding Data(only once unless you changed the database schema or you run docker compose down -v) 
 ```
-cd chatbot-for-customer-support
 docker exec -it chatbot_backend python seed.py
 ```
+
+# Train the rasa model(only once unless you changed nlu.yml, stories.yml, rules.yml, domain.yml, config.yml or you run docker compose down -v)
+```
+docker exec -it chatbot_rasa rasa train
+or
+docker exec -it chatbot_rasa rasa train --force
+```
+
 ```
 📁 Project Structure
 chatbot-for-customer-support/
@@ -115,6 +122,10 @@ docker compose up -d --build backend
 # After changing Rasa bot config (nlu.yml, domain.yml, etc.)
 docker exec -it chatbot_rasa rasa train
 
+# if "docker exec -it chatbot_rasa rasa train" not working
+# Rebuild Rasa model forcing it to retrain (not from cache)
+docker exec -it chatbot_rasa rasa train --force
+
 # Optional: restart Rasa after training
 docker compose restart rasa
 
@@ -137,8 +148,14 @@ docker compose up -d --build
 
 # Stop the services:
 ```
-docker compose down -v or CTRL+C
+docker compose down or CTRL+C
 ```
+
+# Dont use "docker compose down -v" unless:
+- You want a fresh empty database
+- You want to delete ALL trained Rasa models
+- You want to wipe all volumes completely
+- You're resetting the whole project for a clean rebuild
 
 # Database Schema (Simplified)
 - Users
