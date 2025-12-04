@@ -109,37 +109,37 @@ Access the services:
 - FastAPI Docs http://localhost:8000/docs
 - Rasa Server http://localhost:5005
 
-# 🔄 Development Workflow
-1️⃣ If you update BACKEND code:
+# For Developoment:
 ```
-docker compose build backend
-docker compose up
+# After changing backend code (Python)
+docker compose up -d --build backend
+
+# After changing Rasa bot config (nlu.yml, domain.yml, etc.)
+docker exec -it chatbot_rasa rasa train
+
+# Optional: restart Rasa after training
+docker compose restart rasa
+
+# After changing frontend (React/CSS)
+docker compose up -d --build frontend
+
+# After changing DB schema (models.py) and wanting fresh DB
+docker compose down -v
+docker compose up --build
+# In a second terminal, reseed the database
+docker exec -it chatbot_backend python seed.py
+```
+# Use the full rebuild only when:
+- You changed both backend and frontend a lot
+- Or you changed something in docker-compose.yml or Dockerfiles
+- Or you’re not sure what’s stale
+```
+docker compose up -d --build
 ```
 
-If you changed requirements.txt:
+# Stop the services:
 ```
-docker compose build backend --no-cache
-```
-2️⃣ If you update FRONTEND code:
-```
-docker compose build frontend
-docker compose up
-```
-
-If you changed dependencies (package.json):
-```
-docker compose build frontend --no-cache
-```
-3️⃣ If you modify RASA training data:
-
-Train the bot:
-```
-docker compose run --rm rasa train
-```
-
-Restart services:
-```
-docker compose up
+docker compose down or CTRL+C
 ```
 
 # Database Schema (Simplified)
