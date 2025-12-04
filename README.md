@@ -45,7 +45,8 @@ Make sure Docker Desktop is running.
 - Full environment starts with:
 ```
 cd chatbot-for-customer-support
-docker compose up -d --build
+docker compose build
+docker compose up -d
 ```
 This will:
 - Build backend image
@@ -117,7 +118,7 @@ Access the services:
 # For Development:
 ```
 # After changing backend code (Python)
-docker compose up -d --build backend
+docker compose build backend
 
 # After changing Rasa bot config (nlu.yml, domain.yml, etc.)
 docker exec -it chatbot_rasa rasa train
@@ -130,11 +131,11 @@ docker exec -it chatbot_rasa rasa train --force
 docker compose restart rasa
 
 # After changing frontend (React/CSS)
-docker compose up -d --build frontend
+docker compose build frontend
 
 # After changing DB schema (models.py) and wanting fresh DB
 docker compose down -v
-docker compose up -d --build
+docker compose build
 # In a second terminal, reseed the database
 docker exec -it chatbot_backend python seed.py
 ```
@@ -143,7 +144,10 @@ docker exec -it chatbot_backend python seed.py
 - Or you changed something in docker-compose.yml or Dockerfiles
 - Or you’re not sure what’s stale
 ```
-docker compose up -d --build
+docker compose build
+
+# If something looks wrong:
+docker compose build --no-cache
 ```
 
 # Stop the services:
