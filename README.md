@@ -45,8 +45,14 @@ Make sure Docker Desktop is running.
 - Full environment starts with:
 ```
 cd chatbot-for-customer-support
-docker compose up --build
+docker compose up -d --build
 ```
+This will:
+- Build backend image
+- Build frontend image
+- Start PostgreSQL
+- Start Rasa server
+- Serve frontend via Nginx
 
 Includes:
 - backend	FastAPI (Python 3.11)
@@ -92,24 +98,16 @@ chatbot-for-customer-support/
 # 🐳 Running the Project (One Command)
 Make sure Docker Desktop is running.
 
-Then run:
+Then start all the services:
 ```
-docker compose up --build
+docker compose up -d
 ```
-
-This will:
-- Build backend image
-- Build frontend image
-- Start PostgreSQL
-- Start Rasa server
-- Serve frontend via Nginx
-
 Access the services:
 - Frontend	http://localhost:5173
 - FastAPI Docs http://localhost:8000/docs
 - Rasa Server http://localhost:5005
 
-# For Developoment:
+# For Development:
 ```
 # After changing backend code (Python)
 docker compose up -d --build backend
@@ -125,7 +123,7 @@ docker compose up -d --build frontend
 
 # After changing DB schema (models.py) and wanting fresh DB
 docker compose down -v
-docker compose up --build
+docker compose up -d --build
 # In a second terminal, reseed the database
 docker exec -it chatbot_backend python seed.py
 ```
@@ -139,7 +137,7 @@ docker compose up -d --build
 
 # Stop the services:
 ```
-docker compose down or CTRL+C
+docker compose down -v or CTRL+C
 ```
 
 # Database Schema (Simplified)
