@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -41,6 +41,17 @@ class ChatResponse(BaseModel):
     entities: Dict[str, Any]
     quick_replies: List[str]
     payload: Dict[str, Any]
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class LoginResponse(BaseModel):
+    id: int
+    email: str
+    name: Optional[str]
+    role: str
 
 
 @app.post("/api/chat", response_model=ChatResponse)
@@ -126,3 +137,21 @@ def get_conversation_messages(conversation_id: int, db: Session = Depends(get_db
         }
         for m in msgs
     ]
+
+@app.post("/api/login", response_model=LoginResponse)
+def login(req: LoginRequest, db: Session = Depends(get_db)):
+    # 1. Find user by email
+    user = db.query(User).filter(User.email == req.email).first()
+
+    # 2. Basic password check (plaintext for demo/FYP)
+    if not user or user.password != req.password:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+
+    # 3. Return basic profile + role
+    return LoginResponse(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        role=user.role or "customer",
+    )
+

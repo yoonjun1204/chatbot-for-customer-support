@@ -18,7 +18,8 @@ services:
     restart: unless-stopped
     working_dir: /app
     volumes:
-      - ./rasa_bot:/app
+      - ./rasa_bot:/app          # your bot project (domain.yml, nlu.yml, etc.)
+      - rasa_models:/app/models  # 👈 named volume for trained models
     command: >
       run --enable-api --cors "*" --port 5005
     ports:
@@ -34,13 +35,8 @@ services:
       - db
       - rasa
     environment:
-      # SQLAlchemy Postgres URL (matches your updated database.py)
       DATABASE_URL: postgresql+psycopg2://chatbot_user:chatbot_password@db:5432/chatbot_db
-
-      # Rasa URL for rasa_client.py (matches your updated code)
       RASA_URL: http://rasa:5005/model/parse
-
-      # Optional: if you use CORS in FastAPI and want to read this
       FRONTEND_ORIGIN: http://localhost:5173
     ports:
       - "8000:8000"
@@ -50,7 +46,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # These are used as ARG in the frontend Dockerfile → Vite ENV
         VITE_API_BASE_URL: http://localhost:8000
         VITE_RASA_BASE_URL: http://localhost:5005
     container_name: chatbot_frontend
@@ -62,3 +57,4 @@ services:
 
 volumes:
   db_data:
+  rasa_models:   # 👈 new named volume for Rasa models

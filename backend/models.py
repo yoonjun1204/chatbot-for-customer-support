@@ -41,6 +41,10 @@ class User(Base):
     password = Column(String, nullable=False)  # simple for demo/FYP
     name = Column(String, nullable=True)
 
+    # NEW: role for access control
+    # Possible values: "customer", "admin", "agent"
+    role = Column(String, default="customer", nullable=False)
+
     orders = relationship("Order", back_populates="user")
 
 

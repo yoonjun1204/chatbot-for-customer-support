@@ -1,29 +1,28 @@
-# backend/seed.py
 from datetime import date, timedelta
 
 from database import SessionLocal
 from models import User, Order
 
-
 # ---------------------------
-# FIXED USER DATA (10 users)
+# FIXED USER DATA (with roles)
 # ---------------------------
 FIXED_USERS = [
-    {"name": "Alice Tan", "email": "alicetan@example.com"},
-    {"name": "Bob Lim", "email": "boblim@example.com"},
-    {"name": "Charlie Lee", "email": "charlielee@example.com"},
-    {"name": "Daniel Ng", "email": "danielng@example.com"},
-    {"name": "Emily Wong", "email": "emilywong@example.com"},
-    {"name": "Fiona Chong", "email": "fionachong@example.com"},
-    {"name": "Grace Koh", "email": "gracekoh@example.com"},
-    {"name": "Hannah Goh", "email": "hannahgoh@example.com"},
-    {"name": "Ivan Chan", "email": "ivanchan@example.com"},
-    {"name": "Jacob Teo", "email": "jacobteo@example.com"},
+    {"name": "Admin User",     "email": "admin@example.com",  "role": "admin"},
+    {"name": "Support Agent",  "email": "agent@example.com",  "role": "agent"},
+    {"name": "Alice Tan",      "email": "alicetan@example.com", "role": "customer"},
+    {"name": "Bob Lim",        "email": "boblim@example.com",   "role": "customer"},
+    {"name": "Charlie Lee",    "email": "charlielee@example.com", "role": "customer"},
+    {"name": "Daniel Ng",      "email": "danielng@example.com", "role": "customer"},
+    {"name": "Emily Wong",     "email": "emilywong@example.com", "role": "customer"},
+    {"name": "Fiona Chong",    "email": "fionachong@example.com", "role": "customer"},
+    {"name": "Grace Koh",      "email": "gracekoh@example.com", "role": "customer"},
+    {"name": "Hannah Goh",     "email": "hannahgoh@example.com", "role": "customer"},
+    {"name": "Ivan Chan",      "email": "ivanchan@example.com", "role": "customer"},
+    {"name": "Jacob Teo",      "email": "jacobteo@example.com", "role": "customer"},
 ]
 
-
 # ---------------------------
-# FIXED ORDER DATA (10 orders)
+# FIXED ORDER DATA
 # ---------------------------
 FIXED_ORDERS = [
     {"order_number": "ORD-1001", "status": "Processing",        "days_delta": 5},
@@ -50,26 +49,31 @@ def run_seed():
 
         print("✔ Deleted old data")
 
-        print("\n🌱 Seeding 10 fixed users...")
+        print("\n🌱 Seeding users (admin, agent, customers)...")
         user_objects = []
         for u in FIXED_USERS:
             user_obj = User(
                 name=u["name"],
                 email=u["email"],
-                password="password123"  # same for all demo accounts
+                password="password123",
+                role=u.get("role", "customer"),
             )
             db.add(user_obj)
             user_objects.append(user_obj)
 
         db.commit()
 
-        # refresh to get user IDs
+        # refresh to get IDs
         for u in user_objects:
             db.refresh(u)
 
-        print("🌱 Seeding 10 fixed orders...")
+        # Only customers should own orders
+        customer_users = [u for u in user_objects if u.role == "customer"]
+
+        print("🌱 Seeding orders for customers...")
         for i, order_info in enumerate(FIXED_ORDERS):
-            user = user_objects[i % len(user_objects)]  # evenly distribute
+            # cycle only through customer accounts
+            user = customer_users[i % len(customer_users)]
 
             eta = date.today() + timedelta(days=order_info["days_delta"])
 
@@ -87,6 +91,11 @@ def run_seed():
         print("\n✅ Seeding complete!")
         print(f"Total users: {db.query(User).count()}")
         print(f"Total orders: {db.query(Order).count()}")
+
+        print("\nExample customer with order:")
+        print("  Email: alicetan@example.com")
+        print("  Password: password123")
+        print("  Example order: ORD-1001")
 
     finally:
         db.close()
