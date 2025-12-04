@@ -38,11 +38,8 @@ This project is designed for academic purposes (FYP/CSIT321) but follows real-wo
 - Conversations
 - Messages
 
-# Seeding Data
-```
-cd chatbot-for-customer-support
-docker exec -it chatbot_backend python seed.py
-```
+# 🐳 Running the Project (One Command)
+Make sure Docker Desktop is running.
 
 # 🐳 Docker Architecture
 - Full environment starts with:
@@ -57,6 +54,11 @@ Includes:
 - db	PostgreSQL 16
 - rasa	Rasa 3.6
 
+# Seeding Data
+```
+cd chatbot-for-customer-support
+docker exec -it chatbot_backend python seed.py
+```
 ```
 📁 Project Structure
 chatbot-for-customer-support/
